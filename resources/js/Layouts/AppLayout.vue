@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { Head, Link, router, usePage } from '@inertiajs/vue3'
 import { useI18n } from 'vue-i18n'
 import { useTheme } from '@/composables/useTheme'
@@ -9,6 +9,9 @@ import ConfirmDialog from 'primevue/confirmdialog'
 const { t } = useI18n()
 const page = usePage()
 const { isDark, toggle, init } = useTheme()
+
+const companySlug = computed(() => page.props.companySlug)
+const storeUrl    = computed(() => companySlug.value ? `/store/${companySlug.value}` : null)
 
 const sidebarOpen = ref(false)
 const sidebarCollapsed = ref(false)
@@ -45,6 +48,8 @@ const navItems = [
   { label: 'nav.expenses',        icon: 'pi-wallet',        route: 'expenses.index' },
   { divider: true },
   { label: 'nav.settings',        icon: 'pi-cog',           route: 'settings.company' },
+  { divider: true },
+  { label: 'nav.viewStore',        icon: 'pi-storefront',    storeLink: true },
 ]
 
 defineProps({ title: String })
@@ -92,8 +97,20 @@ defineProps({ title: String })
       <nav class="flex-1 overflow-y-auto py-3 px-2">
         <template v-for="(item, idx) in navItems" :key="idx">
           <div v-if="item.divider" class="my-2 border-t border-surface-200 dark:border-surface-700" />
+          <a
+            v-else-if="item.storeLink && storeUrl"
+            :href="storeUrl"
+            target="_blank"
+            rel="noopener"
+            class="flex items-center gap-3 px-3 py-2.5 rounded-lg mb-0.5 text-sm font-medium transition-colors group text-surface-600 dark:text-surface-300 hover:bg-orange-50 dark:hover:bg-orange-500/10 hover:text-orange-600 dark:hover:text-orange-400"
+            :title="sidebarCollapsed ? t(item.label) : ''"
+          >
+            <i class="pi pi-storefront text-base shrink-0 text-surface-400 group-hover:text-orange-500" />
+            <span v-if="!sidebarCollapsed" class="truncate">{{ t(item.label) }}</span>
+            <i v-if="!sidebarCollapsed" class="pi pi-external-link text-xs ml-auto text-surface-300" />
+          </a>
           <Link
-            v-else
+            v-else-if="!item.storeLink"
             :href="route(item.route)"
             :class="[
               'flex items-center gap-3 px-3 py-2.5 rounded-lg mb-0.5 text-sm font-medium transition-colors group',

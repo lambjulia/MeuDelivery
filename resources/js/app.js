@@ -11,6 +11,7 @@ import Aura from '@primevue/themes/aura';
 import ToastService from 'primevue/toastservice';
 import ConfirmationService from 'primevue/confirmationservice';
 import i18n from './i18n/index.js';
+import { createPinia } from 'pinia';
 
 const appName = import.meta.env.VITE_APP_NAME || 'MeuDelivery';
 
@@ -20,6 +21,7 @@ createInertiaApp({
     setup({ el, App, props, plugin }) {
         return createApp({ render: () => h(App, props) })
             .use(plugin)
+            .use(createPinia())
             .use(ZiggyVue)
             .use(i18n)
             .use(PrimeVue, {

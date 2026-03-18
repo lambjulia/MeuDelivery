@@ -29,4 +29,9 @@ class ProductOption extends Model
     {
         return $this->belongsTo(ProductOptionGroup::class, 'product_option_group_id');
     }
+
+    public function optionGroup(): BelongsTo
+    {
+        return $this->belongsTo(ProductOptionGroup::class, 'product_option_group_id');
+    }
 }

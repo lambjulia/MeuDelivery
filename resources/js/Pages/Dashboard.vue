@@ -1,6 +1,6 @@
 <script setup>
 import { computed, ref } from 'vue'
-import { Head, router } from '@inertiajs/vue3'
+import { Head, router, usePage } from '@inertiajs/vue3'
 import AppLayout from '@/Layouts/AppLayout.vue'
 import StatsCard from '@/Components/StatsCard.vue'
 import EmptyState from '@/Components/EmptyState.vue'
@@ -11,6 +11,10 @@ import Select from 'primevue/select'
 const { t } = useI18n()
 const { format: formatMoney } = useCurrency()
 
+const page = usePage()
+const companySlug = computed(() => page.props.companySlug)
+const storeUrl = computed(() => companySlug.value ? `/store/${companySlug.value}` : null)
+console.log('Company Slug:', companySlug.value)
 const props = defineProps({
   metrics: { type: Object, default: () => ({}) },
   period:  { type: String, default: 'today' },
@@ -53,6 +57,16 @@ const maxRevenue      = computed(() => Math.max(...dailyRevenue.value.map(d => d
         class="w-44"
         @change="changePeriod"
       />
+      <a
+        v-if="storeUrl"
+        :href="storeUrl"
+        target="_blank"
+        rel="noopener"
+        class="ml-2 inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-orange-500 text-white text-sm font-semibold hover:opacity-95"
+      >
+        <i class="pi pi-storefront" />
+        {{ t('nav.viewStore') }}
+      </a>
     </div>
 
     <!-- Primary stats -->

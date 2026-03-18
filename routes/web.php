@@ -10,10 +10,32 @@ use App\Http\Controllers\DeliveryZoneController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\Store\PublicOrderController;
+use App\Http\Controllers\Store\PublicProductController;
+use App\Http\Controllers\Store\PublicTrackingController;
+use App\Http\Controllers\Store\StorefrontController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
+// ─── Public Store Routes ───────────────────────────────────────────────────
+Route::prefix('store/{companySlug}')->name('store.')->group(function () {
+    Route::get('/',                        [StorefrontController::class, 'home'])->name('home');
+    Route::get('/cart',                    [StorefrontController::class, 'cart'])->name('cart');
+    Route::get('/checkout',                [StorefrontController::class, 'checkout'])->name('checkout');
+    Route::get('/success/{orderCode}',     [StorefrontController::class, 'success'])->name('success');
+    Route::get('/track/{orderCode}',       [PublicTrackingController::class, 'show'])->name('tracking');
+    Route::get('/product/{productSlug}',   [PublicProductController::class, 'show'])->name('product');
+});
+
+// Public API for store (no auth)
+Route::prefix('api/store/{companySlug}')->name('api.store.')->middleware('throttle:60,1')->group(function () {
+    Route::post('/orders',          [PublicOrderController::class, 'store'])->name('orders.store');
+    Route::post('/validate-coupon', [PublicOrderController::class, 'validateCoupon'])->name('validate-coupon');
+    Route::get('/track/{orderCode}', [PublicTrackingController::class, 'poll'])->name('track.poll');
+});
+
+// ─── Admin Routes ──────────────────────────────────────────────────────────
 Route::middleware([
     'auth:sanctum',
     config('jetstream.auth_session'),
@@ -50,3 +72,4 @@ Route::middleware([
     Route::get('/settings/company', [CompanySettingsController::class, 'show'])->name('settings.company');
     Route::match(['put', 'patch'], '/settings/company', [CompanySettingsController::class, 'update'])->name('settings.company.update');
 });
+

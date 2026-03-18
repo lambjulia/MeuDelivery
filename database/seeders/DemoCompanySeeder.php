@@ -25,6 +25,7 @@ class DemoCompanySeeder extends Seeder
         $company = Company::create([
             'name'              => 'Burger House',
             'trade_name'        => 'Burger House Delivery',
+            'slug'              => 'burger-house',
             'document'          => '12.345.678/0001-99',
             'phone'             => '(11) 98765-4321',
             'email'             => 'contato@burgerhouse.com',
